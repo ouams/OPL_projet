@@ -3,7 +3,6 @@ package opl;
 public class A {
 
 
-
 	public static void main(String[] args) {
 		String fooString = new String("HalloWorld");
 		int num = 15;
@@ -15,7 +14,9 @@ public class A {
 	}
 
 	private static void foo(String str, int num) {
-		System.out.println("fonction foo " + str );		
+		System.out.println("fonction foo " + str );
+		faa(num);
+
 	}
 
 	private static void faa(int num) {
