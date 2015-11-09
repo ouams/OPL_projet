@@ -22,11 +22,12 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.jgrapht</groupId>
-			<artifactId>jgrapht-core</artifactId>
-			<version>0.9.1</version>
-		</dependency>
+	 <dependency>
+      <groupId>org.graphstream</groupId>
+      <artifactId>gs-core</artifactId>
+      <version>1.0</version>
+    </dependency>
+		
 
 		<dependency>
 			<groupId>fr.inria.gforge.spoon</groupId>

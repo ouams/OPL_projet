@@ -7,15 +7,33 @@ import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.visitor.filter.TypeFilter;
 
+/**
+ * Class that create a call graph
+ *
+ * @author sais
+ *
+ */
 public class ProcessorMain extends AbstractProcessor<CtMethod> {
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * spoon.processing.Processor#process(spoon.reflect.declaration.CtElement)
+	 */
 	public void process(CtMethod arg0) {
-		System.out.println(arg0.getSimpleName());
 		List<CtInvocation> elements = arg0.getElements(new TypeFilter(CtInvocation.class));
-		if (elements != null) {
-			for (CtInvocation inv : elements) {
 
-				System.out.println(inv.getExecutable().getSimpleName());
+		if (elements != null) {
+
+			for (CtInvocation inv : elements) {
+				// If the curr invocation has a parent which is not a system
+				// call
+				if ((inv.getParent(CtMethod.class) != null) && (inv.getExecutable().getDeclaration() != null)) {
+					System.out.println("fct : " + inv.getExecutable().getSimpleName() + "    Parent :  "
+							+ inv.getParent(CtMethod.class).getSimpleName());
+				}
+
 			}
 		}
 	}
