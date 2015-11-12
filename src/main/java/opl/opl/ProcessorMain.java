@@ -29,22 +29,16 @@ public class ProcessorMain extends AbstractProcessor<CtMethod> {
 		List<CtInvocation> elements = arg0.getElements(new TypeFilter(CtInvocation.class));
 
 		if (elements != null) {
-			for (CtInvocation inv : elements) {
-				// If the curr invocation has a parent which is not a system
-				// call
-				if ((inv.getParent(CtMethod.class) != null) && (inv.getExecutable().getDeclaration() != null)) {
+			for (CtInvocation inv : elements) {	
+				if (inv.getExecutable().getDeclaration() != null) {
 					if (graph.getNode(inv.getExecutable().getSimpleName()) == null) {
 						final Node n = graph.addNode(inv.getExecutable().getSimpleName());
 						n.addAttribute("ui.label", inv.getExecutable().getSimpleName());
 					}
-					else {
-						System.out.println(inv.getExecutable().getSimpleName());
-						if (graph.getNode(inv.getParent(CtMethod.class).getSimpleName()) != null) {
-							final String parent = inv.getParent(CtMethod.class).getSimpleName();
-							System.out.println("PARENT : " + parent);
-							graph.addEdge(String.valueOf(graph.getEdgeCount() + 1), parent, inv.getExecutable().getSimpleName());
-						}
-						// inv.getParent(CtMethod.class).getSimpleName());
+					
+					if (graph.getNode(inv.getParent(CtMethod.class).getSimpleName()) != null) {
+						final String parent = inv.getParent(CtMethod.class).getSimpleName();
+						graph.addEdge(String.valueOf(graph.getEdgeCount() + 1), parent, inv.getExecutable().getSimpleName(), true);
 					}
 				}
 			}
