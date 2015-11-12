@@ -29,16 +29,25 @@ public class ProcessorMain extends AbstractProcessor<CtMethod> {
 		List<CtInvocation> elements = arg0.getElements(new TypeFilter(CtInvocation.class));
 
 		if (elements != null) {
-			for (CtInvocation inv : elements) {	
+			for (CtInvocation inv : elements) {
+				final String current = inv.getExecutable().getSimpleName();
+				
 				if (inv.getExecutable().getDeclaration() != null) {
 					if (graph.getNode(inv.getExecutable().getSimpleName()) == null) {
-						final Node n = graph.addNode(inv.getExecutable().getSimpleName());
-						n.addAttribute("ui.label", inv.getExecutable().getSimpleName());
+						final Node n = graph.addNode(current);
+						n.addAttribute("ui.label", current);
 					}
 					
-					if (graph.getNode(inv.getParent(CtMethod.class).getSimpleName()) != null) {
+					System.out.println("fct " + current + " parent " + inv.getParent(CtMethod.class).getSimpleName());
+					
+					if (inv.getParent(CtMethod.class).getSimpleName() != null) {
 						final String parent = inv.getParent(CtMethod.class).getSimpleName();
-						graph.addEdge(String.valueOf(graph.getEdgeCount() + 1), parent, inv.getExecutable().getSimpleName(), true);
+						
+						if (graph.getNode(parent) == null) {
+							final Node n = graph.addNode(parent);
+							n.addAttribute("ui.label", parent);
+						}	
+						graph.addEdge(String.valueOf(graph.getEdgeCount() + 1), parent, current, true);
 					}
 				}
 			}
