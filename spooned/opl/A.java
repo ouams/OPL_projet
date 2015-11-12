@@ -11,6 +11,7 @@ public class A {
 
     private static void foo(java.lang.String str, int num) {
         java.lang.System.out.println(("fonction foo " + str));
+        opl.A.faa(num);
     }
 
     private static void faa(int num) {
