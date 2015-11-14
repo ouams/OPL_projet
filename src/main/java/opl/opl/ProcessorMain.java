@@ -56,7 +56,7 @@ public class ProcessorMain extends AbstractProcessor<CtMethod> {
 							n.addAttribute("ui.label", parent);
 						}	
 						
-						// We add an oriented edge between parent and current method call
+						// We add an oriented edge between parent and current method call, if it doesn't exist
 						graph.addEdge(String.valueOf(graph.getEdgeCount() + 1), parent, current, true);
 					}
 				}
@@ -72,8 +72,8 @@ public class ProcessorMain extends AbstractProcessor<CtMethod> {
 		final Node n = graph.addNode("main");
 		n.setAttribute("ui.label", "main");
 		
-		// Launching the main process about creating the graph
-		spoon.Launcher.main(new String[] { "-p", "opl.opl.ProcessorMain", "-i", "sources/opl/A.java" });
+		// Launching the main process about creating the graph, taking one file from sources folder
+		spoon.Launcher.main(new String[] { "-p", "opl.opl.ProcessorMain", "-i", "sources/opl/WordCount.java" });
 
 		graph.display();
 	}
