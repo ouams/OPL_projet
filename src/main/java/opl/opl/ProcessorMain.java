@@ -6,6 +6,7 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
+import spoon.Launcher;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtMethod;
@@ -67,15 +68,19 @@ public class ProcessorMain extends AbstractProcessor<CtMethod> {
 	public static void main(String[] args) throws Exception {
 		// create a JGraphT call graph
 		graph = new SingleGraph("CallGraph");
-
 		// Add main node to the graph
 		final Node n = graph.addNode("main");
 		n.setAttribute("ui.label", "main");
 		
-		// Launching the main process about creating the graph, taking one file from sources folder
-		spoon.Launcher.main(new String[] { "-p", "opl.opl.ProcessorMain", "-i", "sources/opl/WordCount.java" });
+		
+		//Lancement du processeur
+		 Launcher spoon = new Launcher(); 
+	     spoon.addProcessor(new ProcessorMain());
+	     spoon.run(new String[]{"-i", "sources/opl/testimport/"});
+		
+		
 
-		graph.display();
+		graph.display(true);
 	}
 
 }
