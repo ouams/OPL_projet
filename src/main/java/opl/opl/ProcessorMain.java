@@ -1,11 +1,14 @@
 package opl.opl;
 
 import java.util.List;
+import java.util.Random;
 
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.swingViewer.View;
+import org.graphstream.ui.swingViewer.Viewer;
 
 import spoon.Launcher;
 import spoon.processing.AbstractProcessor;
@@ -36,60 +39,58 @@ public class ProcessorMain extends AbstractProcessor<CtMethod<?>> {
 
 		// If we have at least one element
 		if (elements != null) {
-
+			double seuil = 0.8;
 			// For each element of the list
 			for (CtInvocation<?> inv : elements) {
-
-				// Getting its name
-				String current = inv.getExecutable().getSimpleName();
-
-				// Get the class name where the called method belongs
-				if (inv.getExecutable().getDeclaration() != null) {
-					System.out.println("fct : " + current + " class :"
-							+ inv.getExecutable().getDeclaration().getParent(CtClass.class).getSimpleName());
-				}
-
-				// If it is not a native function (e.g println, error ...)
-				if (inv.getExecutable().getDeclaration() != null) {
-					// If the corresponding node doesn't exist, we create it
-					if (graph.getNode(current) == null) {
-						final Node n = graph.addNode(current);
-						if (inv.getExecutable().getDeclaration().getParent(CtClass.class) != null)
-							n.addAttribute("ui.label", current + " - ["
-									+ inv.getExecutable().getDeclaration().getParent(CtClass.class).getSimpleName()
-									+ "]");
-					}
-
-					// If the current method call has a parent (e.g main is a
-					// parent of a function called inside it)
-					if (inv.getParent(CtMethod.class).getSimpleName() != null) {
-						// Getting the parent's name
-						CtMethod<?> parent = inv.getParent(CtMethod.class);
-
-						// If the parent does not have a dedicated node yet, we
-						// create it
-						if (graph.getNode(parent.getSimpleName()) == null) {
-
-							final Node n = graph.addNode(parent.getSimpleName());
-
+				Random r = new Random();
+				double randomValue = r.nextDouble();
+				
+				if (randomValue > seuil)
+				{
+					// Getting its name
+					String current = inv.getExecutable().getSimpleName();
+	
+					// If it is not a native function (e.g println, error ...)
+					if (inv.getExecutable().getDeclaration() != null) {
+						// If the corresponding node doesn't exist, we create it
+						if (graph.getNode(current) == null) {
+							final Node n = graph.addNode(current);
 							if (inv.getExecutable().getDeclaration().getParent(CtClass.class) != null)
-								n.addAttribute("ui.label", parent.getSimpleName() + " - " + inv.getExecutable()
-										.getDeclaration().getParent(CtClass.class).getSimpleName());
+								n.addAttribute("ui.label", current + " - ["
+										+ inv.getExecutable().getDeclaration().getParent(CtClass.class).getSimpleName()
+										+ "]");
 						}
-
-						// We add an oriented edge between parent and current if
-						// it doesn't exists yet
-						String id = parent.getSimpleName() + "-" + current;
-						Edge edge = graph.getEdge(id);
-
-						if (edge != null) {
-							edge.changeAttribute("ui.label", (Integer) edge.getAttribute("ui.label") + 1);
-						} else {
-							graph.addEdge(id, parent.getSimpleName(), current, true);
-							Edge e = graph.getEdge(id);
-							e.addAttribute("ui.label", 1);
+	
+						// If the current method call has a parent (e.g main is a
+						// parent of a function called inside it)
+						if (inv.getParent(CtMethod.class).getSimpleName() != null) {
+							// Getting the parent's name
+							CtMethod<?> parent = inv.getParent(CtMethod.class);
+	
+							// If the parent does not have a dedicated node yet, we
+							// create it
+							if (graph.getNode(parent.getSimpleName()) == null) {
+	
+								final Node n = graph.addNode(parent.getSimpleName());
+	
+								if (inv.getExecutable().getDeclaration().getParent(CtClass.class) != null)
+									n.addAttribute("ui.label", parent.getSimpleName() + " - " + inv.getExecutable()
+											.getDeclaration().getParent(CtClass.class).getSimpleName());
+							}
+	
+							// We add an oriented edge between parent and current if
+							// it doesn't exists yet
+							String id = parent.getSimpleName() + "-" + current;
+	
+							if (graph.getEdge(id) != null) {
+								graph.getEdge(id).changeAttribute("ui.label", (Integer) graph.getEdge(id).getAttribute("ui.label") + 1);
+							} else {
+								graph.addEdge(id, parent.getSimpleName(), current, true);
+								Edge e = graph.getEdge(id);
+								e.addAttribute("ui.label", 1);
+							}
+	
 						}
-
 					}
 				}
 			}
@@ -106,9 +107,18 @@ public class ProcessorMain extends AbstractProcessor<CtMethod<?>> {
 		// Lancement du processeur
 		Launcher spoon = new Launcher();
 		spoon.addProcessor(new ProcessorMain());
-		spoon.run(new String[] { "-i", "sources/opl/ActionPiscine/src/", "-x" });
+		spoon.run(new String[] { "-i", "../java/src", "-x" });
 
-		graph.display(true);
+		Viewer viewer = graph.display(false);
+		View view = viewer.getDefaultView();
+		view.resizeFrame(800, 600);
+		view.setViewPercent(0.5);
+		
+		graph.addAttribute("ui.quality");
+		graph.addAttribute("ui.antialias");
+		graph.addAttribute("ui.stylesheet", "url('sources/stylesheet.css')");
+		
+		viewer.enableAutoLayout();
 	}
 
 }
