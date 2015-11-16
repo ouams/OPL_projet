@@ -2,6 +2,7 @@ package opl.opl;
 
 import java.util.List;
 
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -19,7 +20,7 @@ import spoon.reflect.visitor.filter.TypeFilter;
  * @author sais, badache
  *
  */
-public class ProcessorMain extends AbstractProcessor<CtMethod> {
+public class ProcessorMain extends AbstractProcessor<CtMethod<?>> {
 	// Global graph for the whole execution
 	static Graph graph;
 
@@ -29,15 +30,15 @@ public class ProcessorMain extends AbstractProcessor<CtMethod> {
 	 * @see
 	 * spoon.processing.Processor#process(spoon.reflect.declaration.CtElement)
 	 */
-	public void process(CtMethod arg0) {
+	public void process(CtMethod<?> arg0) {
 		// Every elements which are function calls are registered here
-		List<CtInvocation> elements = arg0.getElements(new TypeFilter(CtInvocation.class));
+		List<CtInvocation<?>> elements = arg0.getElements(new TypeFilter(CtInvocation.class));
 
 		// If we have at least one element
 		if (elements != null) {
 
 			// For each element of the list
-			for (CtInvocation inv : elements) {
+			for (CtInvocation<?> inv : elements) {
 
 				// Getting its name
 				String current = inv.getExecutable().getSimpleName();
@@ -54,15 +55,16 @@ public class ProcessorMain extends AbstractProcessor<CtMethod> {
 					if (graph.getNode(current) == null) {
 						final Node n = graph.addNode(current);
 						if (inv.getExecutable().getDeclaration().getParent(CtClass.class) != null)
-							n.addAttribute("ui.label", current + " - "
-									+ inv.getExecutable().getDeclaration().getParent(CtClass.class).getSimpleName());
+							n.addAttribute("ui.label", current + " - ["
+									+ inv.getExecutable().getDeclaration().getParent(CtClass.class).getSimpleName()
+									+ "]");
 					}
 
 					// If the current method call has a parent (e.g main is a
 					// parent of a function called inside it)
 					if (inv.getParent(CtMethod.class).getSimpleName() != null) {
 						// Getting the parent's name
-						CtMethod parent = inv.getParent(CtMethod.class);
+						CtMethod<?> parent = inv.getParent(CtMethod.class);
 
 						// If the parent does not have a dedicated node yet, we
 						// create it
@@ -75,9 +77,19 @@ public class ProcessorMain extends AbstractProcessor<CtMethod> {
 										.getDeclaration().getParent(CtClass.class).getSimpleName());
 						}
 
-						// We add an oriented edge between parent and current
-						// method call, if it doesn't exist
-						graph.addEdge(String.valueOf(graph.getEdgeCount() + 1), parent.getSimpleName(), current, true);
+						// We add an oriented edge between parent and current if
+						// it doesn't exists yet
+						String id = parent.getSimpleName() + "-" + current;
+						Edge edge = graph.getEdge(id);
+
+						if (edge != null) {
+							edge.changeAttribute("ui.label", (Integer) edge.getAttribute("ui.label") + 1);
+						} else {
+							graph.addEdge(id, parent.getSimpleName(), current, true);
+							Edge e = graph.getEdge(id);
+							e.addAttribute("ui.label", 1);
+						}
+
 					}
 				}
 			}
@@ -94,7 +106,7 @@ public class ProcessorMain extends AbstractProcessor<CtMethod> {
 		// Lancement du processeur
 		Launcher spoon = new Launcher();
 		spoon.addProcessor(new ProcessorMain());
-		spoon.run(new String[] { "-i", "sources/opl/testimport" });
+		spoon.run(new String[] { "-i", "sources/opl/ActionPiscine/src/", "-x" });
 
 		graph.display(true);
 	}

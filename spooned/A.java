@@ -12,6 +12,7 @@ public class A {
         a.displayA();
         B test = new B();
         test.display();
+        test.display();
     }
 }
 
