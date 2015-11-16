@@ -15,6 +15,7 @@ public class A {
 		
 		B test = new B();
 		
+		
 		test.display();
 	}
 }
