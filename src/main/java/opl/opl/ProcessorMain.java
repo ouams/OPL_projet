@@ -56,7 +56,7 @@ public class ProcessorMain extends AbstractProcessor<CtMethod<?>> {
 						if (graph.getNode(current) == null) {
 							final Node n = graph.addNode(current);
 							if (inv.getExecutable().getDeclaration().getParent(CtClass.class) != null)
-								n.addAttribute("ui.label", current + " - ["
+								n.addAttribute("ui.label", current + " ["
 										+ inv.getExecutable().getDeclaration().getParent(CtClass.class).getSimpleName()
 										+ "]");
 						}
@@ -107,7 +107,7 @@ public class ProcessorMain extends AbstractProcessor<CtMethod<?>> {
 		// Lancement du processeur
 		Launcher spoon = new Launcher();
 		spoon.addProcessor(new ProcessorMain());
-		spoon.run(new String[] { "-i", "../java/src", "-x" });
+		spoon.run(new String[] { "-i", "sources_test/opl/java/src", "-x" });
 
 		Viewer viewer = graph.display(false);
 		View view = viewer.getDefaultView();
@@ -116,7 +116,7 @@ public class ProcessorMain extends AbstractProcessor<CtMethod<?>> {
 		
 		graph.addAttribute("ui.quality");
 		graph.addAttribute("ui.antialias");
-		graph.addAttribute("ui.stylesheet", "url('sources/stylesheet.css')");
+		graph.addAttribute("ui.stylesheet", "url('sources_test/stylesheet.css')");
 		
 		viewer.enableAutoLayout();
 	}
